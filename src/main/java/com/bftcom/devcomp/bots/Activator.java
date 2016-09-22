@@ -15,10 +15,7 @@ public class Activator implements BundleActivator, ServiceListener {
 
   public void start(BundleContext bundleContext) throws Exception {
     logger.info("bundle " + bundleContext.getBundle().getSymbolicName() + "started");
-
-    JabberBot bot = new JabberBot();
-    botThread = new Thread(bot);
-    botThread.start();
+    new BotManager();
   }
 
   public void stop(BundleContext bundleContext) throws Exception {
