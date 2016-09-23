@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
@@ -41,14 +42,20 @@ public class BotManager implements IBotManager {
     try {
       connection = factory.newConnection();
       channel = connection.createChannel();
-      new AdapterQueueConsumer(channel, this, IBotConst.QUEUE_ADAPTER_PREFIX + XMPP_ADAPTER);
-    } catch (IOException | TimeoutException e) {
+      AdapterQueueConsumer adapterQueueConsumer = new AdapterQueueConsumer(channel, this, IBotConst.QUEUE_TO_ADAPTER_PREFIX + XMPP_ADAPTER);
+    } catch (ConnectException e ) {
+      logger.error("Не удалось подключиться к системе обмена сообщений. Убедитесь, что сервер системы (RabbitMQ) запущен.", e);
+    }catch (IOException | TimeoutException e) {
       logger.error("", e);
-    }
+    } 
   }
 
   @Override
   public boolean startBotSession(String id, Map<String, String> userProps, Map<String, String> serviceProps) {
+//    JabberBot b = new JabberBot();
+//    Thread thread1 = new Thread(b);
+//    thread1.start();
+    
     logger.info("startBotSession id=" + id + ";userProperties=" + userProps.toString());
     //prevent starting bot sessions with the same id
     if (id != null) {
@@ -63,8 +70,8 @@ public class BotManager implements IBotManager {
     Bot bot = new Bot(serviceProps.get(IBotConst.PROP_BOT_NAME), userProps);
     try {
 
-      String outQueueName = IBotConst.QUEUE_BOT_PREFIX + bot.getName();
-      String inQueueName = IBotConst.QUEUE_SERVICE_PREFIX + "BotQueue";
+      String outQueueName = IBotConst.QUEUE_TO_BOT_PREFIX + bot.getName();
+      String inQueueName = IBotConst.QUEUE_FROM_BOT_PREFIX + bot.getName();
 
       logger.debug("creating queues");
       bot.setInQueueName(inQueueName);

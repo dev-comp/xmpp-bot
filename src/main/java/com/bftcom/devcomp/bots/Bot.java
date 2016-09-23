@@ -63,18 +63,28 @@ public class Bot implements Runnable {
       XMPPTCPConnectionConfiguration.Builder configBuilder = XMPPTCPConnectionConfiguration.builder();
       String username = config.get(Configuration.USERNAME);
       String password = config.get(Configuration.PASSWORD);
+      String domain = config.get(Configuration.DOMAIN);
+      String server = config.get(Configuration.SERVER);
+      String host = config.get(Configuration.SERVER);
+      int port = Integer.parseInt(config.get(Configuration.PORT));
+
+      String pHost = config.get(Configuration.PROXY_HOST);
+      String pUser = config.get(Configuration.PROXY_USER);
+      String pPass = config.get(Configuration.PROXY_PASSWORD);
+      int pPort = Integer.parseInt(config.get(Configuration.PROXY_PORT));
 
       configBuilder.setUsernameAndPassword(username, password);
-      configBuilder.setResource(config.get(Configuration.DOMAIN));
-      configBuilder.setServiceName(config.get(Configuration.SERVER));
-      configBuilder.setHost(config.get(Configuration.SERVER));
-      configBuilder.setPort(Integer.parseInt(config.get(Configuration.PORT)));
+      configBuilder.setResource(domain);
+      configBuilder.setServiceName(server);
+      configBuilder.setHost(server);
+      configBuilder.setPort(port);
+      
       configBuilder.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
       configBuilder.setConnectTimeout(60000);
       ProxyInfo.ProxyType proxyType = getProxyType(config.get(Configuration.PROXY_TYPE));
-      if (proxyType != ProxyInfo.ProxyType.NONE)
-        configBuilder.setProxyInfo(new ProxyInfo(proxyType, config.get(Configuration.PROXY_HOST),
-            Integer.parseInt(config.get(Configuration.PROXY_PORT)), config.get(Configuration.PROXY_USER), config.get(Configuration.PROXY_PASSWORD)));
+      if (proxyType != ProxyInfo.ProxyType.NONE) {
+        configBuilder.setProxyInfo(new ProxyInfo(proxyType, pHost, pPort, pUser, pPass));
+      }
       connection = new XMPPTCPConnection(configBuilder.build());
       int priority = 10;
       connection.connect();

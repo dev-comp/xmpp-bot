@@ -2,6 +2,7 @@ package com.bftcom.devcomp.bots.queues;
 
 import com.bftcom.devcomp.api.BotCommand;
 import com.bftcom.devcomp.api.Configuration;
+import com.bftcom.devcomp.api.IBotConst;
 import com.bftcom.devcomp.api.Message;
 import com.bftcom.devcomp.bots.BotManager;
 import com.rabbitmq.client.AMQP;
@@ -39,6 +40,7 @@ public class AdapterQueueConsumer extends AbstractDefaultConsumer {
     logger.debug("subscribing to the queue " + queueName);
     String[] _consumerTag = new String[1];
     _consumerTag[0] = getChannel().basicConsume(queueName, true, this);//subscribe
+    
     getChannel().addShutdownListener(cause -> logger.info("shutting down channel " + declareOk.getQueue()));
     logger.debug("subscribed to the queue " + queueName + " with consumerTag = " + _consumerTag[0]);
   }
@@ -54,13 +56,13 @@ public class AdapterQueueConsumer extends AbstractDefaultConsumer {
 
     switch (command) {
       case ADAPTER_START_BOT:
-        botManager.startBotSession(m.getUserProperties().get(Configuration.USERNAME), m.getUserProperties(), m.getServiceProperties());
+        botManager.startBotSession(m.getServiceProperties().get(IBotConst.PROP_BOT_NAME), m.getUserProperties(), m.getServiceProperties());
         break;
       case ADAPTER_STOP_ALL_BOTS:
         botManager.stopAllBotSessions();
         break;
       case ADAPTER_STOP_BOT:
-        botManager.stopBotSession(m.getUserProperties().get(Configuration.BOT_TOKEN));
+         botManager.stopBotSession(m.getServiceProperties().get(IBotConst.PROP_BOT_NAME));
         break;
     }
   }
