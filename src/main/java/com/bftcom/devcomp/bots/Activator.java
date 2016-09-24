@@ -1,5 +1,6 @@
 package com.bftcom.devcomp.bots;
 
+import com.bftcom.devcomp.adapters.XmppAdapter;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceEvent;
@@ -12,14 +13,15 @@ public class Activator implements BundleActivator, ServiceListener {
   Thread botThread;
   @SuppressWarnings("PackageAccessibility")
   public static final Logger logger = LoggerFactory.getLogger(Activator.class);
+  private XmppAdapter xmppAdapter;
 
   public void start(BundleContext bundleContext) throws Exception {
-    logger.info("bundle " + bundleContext.getBundle().getSymbolicName() + "started");
-    new BotManager();
+    logger.info("bundle fucking " + bundleContext.getBundle().getSymbolicName() + "started");
+    xmppAdapter = new XmppAdapter();
   }
 
   public void stop(BundleContext bundleContext) throws Exception {
-    botThread.interrupt();
+    xmppAdapter.stopAllBotSessions();
     logger.info("bundle " + bundleContext.getBundle().getSymbolicName() + " stopped");
   }
 
