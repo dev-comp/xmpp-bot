@@ -47,7 +47,7 @@ public class XmppAdapter extends AbstractMessengerAdapter<Thread> {
   protected IBot createNewBot(Map<String, String> serviceProps, Map<String, String> userProps) {
     Map<String, String> config = new HashMap<>(serviceProps);
     config.putAll(userProps);
-    return new XmppBot("id", config);
+    return new XmppBot(serviceProps.get(IBotConst.PROP_BOT_NAME), config);
   }
 
 
@@ -71,7 +71,7 @@ public class XmppAdapter extends AbstractMessengerAdapter<Thread> {
   public static void main(String[] args) {
     XmppAdapter botManager = new XmppAdapter();
     HashMap<String, String> serviceProps = new HashMap<>();
-    serviceProps.put(IBotConst.PROP_BOT_NAME, "tester");
+    serviceProps.put(IBotConst.PROP_BOT_NAME, "IkkaBot");
     HashMap<String, String> userProps = new HashMap<>();
     userProps.put(Configuration.PROXY_HOST, "localhost");
     userProps.put(Configuration.PROXY_PORT, "53128");
@@ -87,6 +87,6 @@ public class XmppAdapter extends AbstractMessengerAdapter<Thread> {
     userProps.put(Configuration.PASSWORD, "1Jabber@");
     
     
-    botManager.startBotSession("test", userProps, serviceProps);
+    botManager.startBotSession("IkkaBot", userProps, serviceProps);
   }
 }

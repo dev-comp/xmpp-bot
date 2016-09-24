@@ -106,11 +106,11 @@
       <!--<scope>provided</scope>-->
     </dependency>
 
-    <dependency>
-      <groupId>com.bftcom.devcomp.api</groupId>
-      <artifactId>bot-adapter-api</artifactId>
-      <version>1.0.0</version>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>com.bftcom.devcomp.api</groupId>-->
+      <!--<artifactId>bot-adapter-api</artifactId>-->
+      <!--<version>1.0.0</version>-->
+    <!--</dependency>-->
 
     <!-- https://mvnrepository.com/artifact/org.jxmpp/jxmpp-core -->
     <dependency>
