@@ -45,7 +45,7 @@ public class XmppBot implements IBot, Runnable {
 
   private XMPPTCPConnectionConfiguration.Builder configBuilder;
 
-  public XmppBot(String name, Map<String, String> config) { 
+  public XmppBot(String name, Map<String, String> config) throws IOException, XMPPException, SmackException {
     logger.debug("About to create a new xmpp bot");
     this.config = config;
     this.name = name;
@@ -77,6 +77,16 @@ public class XmppBot implements IBot, Runnable {
     if (proxyType != ProxyInfo.ProxyType.NONE) {
       configBuilder.setProxyInfo(new ProxyInfo(proxyType, pHost, pPort, pUser, pPass));
     }
+
+    connection = new XMPPTCPConnection(configBuilder.build());
+    int priority = 10;
+    connection.connect();
+    connection.login(username, password);
+    Presence presence = new Presence(Presence.Type.available);
+    presence.setStatus("online");
+    connection.sendStanza(presence);
+    presence.setPriority(priority);
+
     logger.debug("bot's configuration has been completed");
   }
 
@@ -160,14 +170,7 @@ public class XmppBot implements IBot, Runnable {
   @Override
   public void run() {
     try {
-      connection = new XMPPTCPConnection(configBuilder.build());
-      int priority = 10;
-      connection.connect();
-      connection.login(username, password);
-      Presence presence = new Presence(Presence.Type.available);
-      presence.setStatus("online");
-      connection.sendStanza(presence);
-      presence.setPriority(priority);
+
       StanzaFilter filter = new AndFilter(new StanzaTypeFilter(org.jivesoftware.smack.packet.Message.class));
 
       StanzaListener myListener = packet -> {
@@ -196,12 +199,6 @@ public class XmppBot implements IBot, Runnable {
           }
           serviceProperties.put("chatId", String.valueOf(from));
           handleUserIncomingData(msgToForward);
-
-          //String JID = from;
-
-          // обрабатываем сообщение. можно писать что угодно :)
-          // пока что пусть будет эхо-бот
-//          sendMessage(JID, makeAnswer("DEBUG " + messageBody));
         }
       };
 
@@ -212,16 +209,8 @@ public class XmppBot implements IBot, Runnable {
         Thread.sleep(60000);
       }
     } catch (InterruptedException e) {
-      e.printStackTrace();
+      logger.error("", e);
       connection.disconnect();
-    } catch (XMPPException e) {
-      e.printStackTrace();
-    } catch (SmackException.NotConnectedException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (SmackException e) {
-      e.printStackTrace();
     }
   }
 
@@ -237,16 +226,5 @@ public class XmppBot implements IBot, Runnable {
         return ProxyInfo.ProxyType.SOCKS5;
     }
     return ProxyInfo.ProxyType.NONE;
-  }
-
-  private String makeAnswer(String msg) {
-    String answer = "Здравствуйте!";
-    if (msg == null)
-      return answer;
-    if (msg.contains("?"))
-      answer = "Ваш вопрос очень важен для нас. Пожалуйста, оставайтесь на линии.";
-    else
-      answer = msg;
-    return answer;
   }
 }

@@ -1,14 +1,14 @@
 package com.bftcom.devcomp.adapters;
 
 import com.bftcom.devcomp.api.AbstractMessengerAdapter;
-import com.bftcom.devcomp.api.Configuration;
 import com.bftcom.devcomp.api.IBot;
 import com.bftcom.devcomp.api.IBotConst;
 import com.bftcom.devcomp.bots.XmppBot;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -51,7 +51,12 @@ public class XmppAdapter extends AbstractMessengerAdapter<Thread> {
   protected IBot createNewBot(Map<String, String> serviceProps, Map<String, String> userProps) {
     Map<String, String> config = new HashMap<>(serviceProps);
     config.putAll(userProps);
-    return new XmppBot(serviceProps.get(IBotConst.PROP_BOT_NAME), config);
+    try {
+      return new XmppBot(serviceProps.get(IBotConst.PROP_BOT_NAME), config);
+    } catch (IOException | XMPPException | SmackException e) {
+      logger.error("", e);
+      return null;
+    }
   }
 
 
@@ -84,7 +89,7 @@ public class XmppAdapter extends AbstractMessengerAdapter<Thread> {
       System.setProperty((String) o, props.getProperty(String.valueOf(o)));
     }
 
-    XmppAdapter botManager = new XmppAdapter();
+    /*XmppAdapter botManager =*/ new XmppAdapter();
 
     /*
     HashMap<String, String> serviceProps = new HashMap<>();
