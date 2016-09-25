@@ -33,6 +33,9 @@ public abstract class AbstractMessengerAdapter<E> implements IMessengerAdapter {
     System.out.println("AbstractMessengerAdapter");
     logger.info("creating a new bot manager adapter");
     factory = new ConnectionFactory();
+    factory.setHost(System.getProperties().getProperty(Configuration.RABBITMQ_HOST));
+    factory.setUsername(System.getProperties().getProperty(Configuration.RABBITMQ_USERNAME));
+    factory.setPassword(System.getProperties().getProperty(Configuration.RABBITMQ_PASSWORD));
     try {
       connection = factory.newConnection();
       channel = connection.createChannel();

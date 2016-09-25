@@ -8,8 +8,12 @@ import com.bftcom.devcomp.bots.XmppBot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * todo@shapoval add class description
@@ -69,7 +73,20 @@ public class XmppAdapter extends AbstractMessengerAdapter<Thread> {
   }
     
   public static void main(String[] args) {
+    Properties props = new Properties();
+    try {
+      props.load(new FileInputStream("project.properties"));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    for (Object o : props.keySet()) {
+      System.setProperty((String) o, props.getProperty(String.valueOf(o)));
+    }
+
     XmppAdapter botManager = new XmppAdapter();
+
+    /*
     HashMap<String, String> serviceProps = new HashMap<>();
     serviceProps.put(IBotConst.PROP_BOT_NAME, "IkkaBot");
     HashMap<String, String> userProps = new HashMap<>();
@@ -85,8 +102,12 @@ public class XmppAdapter extends AbstractMessengerAdapter<Thread> {
     
     userProps.put(Configuration.USERNAME, "ikka");
     userProps.put(Configuration.PASSWORD, "1Jabber@");
-    
-    
+
     botManager.startBotSession("IkkaBot", userProps, serviceProps);
+    */
+
+
+    
+
   }
 }

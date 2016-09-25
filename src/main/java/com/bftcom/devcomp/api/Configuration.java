@@ -24,5 +24,11 @@ public interface Configuration {
   String PROXY_TYPE = "proxyType";
   String PROXY_USER = "proxyUser";
   String PROXY_PASSWORD = "proxyPassword";
+
+  //rabbitmq
+  String RABBITMQ_HOST = "rabbitmq.host";
+  String RABBITMQ_USERNAME = "rabbitmq.username";
+  String RABBITMQ_PASSWORD = "rabbitmq.password";
+
   
 }
