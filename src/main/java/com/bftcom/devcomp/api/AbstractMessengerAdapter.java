@@ -1,6 +1,7 @@
 package com.bftcom.devcomp.api;
 
 import com.bftcom.devcomp.queues.AdapterQueueConsumer;
+import com.bftcom.devcomp.queues.BotQueueConsumer;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -68,11 +69,11 @@ public abstract class AbstractMessengerAdapter<E> implements IMessengerAdapter {
       logger.debug("creating queues");
       bot.setInChannel(createChannel(inQueueName));
       bot.setOutChannel(createChannel(outQueueName));
+      return startBotSession(id, bot);
     } catch (IOException e) {
+      logger.debug("", e);
       return false;
     }
-
-    return startBotSession(id, bot);
   }
 
   protected abstract boolean startBotSession(String id, IBot bot);

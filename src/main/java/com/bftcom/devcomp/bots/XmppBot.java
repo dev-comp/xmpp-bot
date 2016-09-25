@@ -1,6 +1,7 @@
 package com.bftcom.devcomp.bots;
 
 import com.bftcom.devcomp.api.*;
+import com.bftcom.devcomp.queues.BotQueueConsumer;
 import com.rabbitmq.client.Channel;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.SmackException;
@@ -138,7 +139,8 @@ public class XmppBot implements IBot, Runnable {
   }
 
   @Override
-  public void setOutChannel(Channel out) {
+  public void setOutChannel(Channel out) throws IOException {
+      new BotQueueConsumer(out, this);
     outChannel = out;
   }
 
@@ -185,15 +187,21 @@ public class XmppBot implements IBot, Runnable {
 
           userProperties.put(IBotConst.PROP_BODY_TEXT, messageBody);
           serviceProperties.put(IBotConst.PROP_BOT_NAME, getName());
-          serviceProperties.put(IBotConst.PROP_USER_NAME, message.getFrom());
-          serviceProperties.put("chatId", String.valueOf(message.getFrom()));
+          String from = message.getFrom();
+          int endIndex = from.indexOf("/");
+          if (endIndex >= 0) {
+            serviceProperties.put(IBotConst.PROP_USER_NAME, from.subSequence(0, endIndex).toString());
+          } else {
+            serviceProperties.put(IBotConst.PROP_USER_NAME, from);
+          }
+          serviceProperties.put("chatId", String.valueOf(from));
           handleUserIncomingData(msgToForward);
 
-          String JID = message.getFrom();
+          //String JID = from;
 
           // обрабатываем сообщение. можно писать что угодно :)
           // пока что пусть будет эхо-бот
-          sendMessage(JID, makeAnswer("DEBUG " + messageBody));
+//          sendMessage(JID, makeAnswer("DEBUG " + messageBody));
         }
       };
 

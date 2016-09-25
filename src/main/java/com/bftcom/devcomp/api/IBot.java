@@ -38,7 +38,7 @@ public interface IBot extends IDeliveryHandler {
 
   Channel getInChannel();
 
-  void setOutChannel(Channel out);
+  void setOutChannel(Channel out) throws IOException;
 
   Channel getOutChannel();
 
