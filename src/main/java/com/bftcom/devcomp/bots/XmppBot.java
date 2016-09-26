@@ -43,6 +43,8 @@ public class XmppBot implements IBot, Runnable {
   private String inQueueName;
   private String name;
 
+  private Presence presence;
+
   private XMPPTCPConnectionConfiguration.Builder configBuilder;
 
   public XmppBot(String name, Map<String, String> config) throws IOException, XMPPException, SmackException {
@@ -78,16 +80,20 @@ public class XmppBot implements IBot, Runnable {
       configBuilder.setProxyInfo(new ProxyInfo(proxyType, pHost, pPort, pUser, pPass));
     }
 
+    connectAndLogin();
+
+    logger.debug("bot's configuration has been completed");
+  }
+
+  private void connectAndLogin() throws IOException, XMPPException, SmackException {
     connection = new XMPPTCPConnection(configBuilder.build());
     int priority = 10;
     connection.connect();
     connection.login(username, password);
-    Presence presence = new Presence(Presence.Type.available);
+    presence = new Presence(Presence.Type.available);
     presence.setStatus("online");
     connection.sendStanza(presence);
     presence.setPriority(priority);
-
-    logger.debug("bot's configuration has been completed");
   }
 
   public void sendMessage(String to, String message) {
@@ -205,11 +211,30 @@ public class XmppBot implements IBot, Runnable {
       connection.addAsyncStanzaListener(myListener, filter);
       Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.accept_all);
 
-      while (connection.isConnected()) {
-        Thread.sleep(60000);
+      while (true) {
+        Thread.sleep(15000);
+
+        try {
+          connection.sendStanza(presence);
+        }
+        catch (SmackException.NotConnectedException e) {
+          e.printStackTrace();
+          connection.disconnect();
+        }
+
+        if (!connection.isConnected()) {
+          logger.info("Разорвана связь сервером XMPP. Восстановление.");
+          try {
+            connectAndLogin();
+          } catch (IOException | XMPPException | SmackException e) {
+            logger.info("Восстановление связи с сервером xmpp: " + e.getMessage());
+            e.printStackTrace();
+          }
+        }
       }
+
     } catch (InterruptedException e) {
-      logger.error("", e);
+      logger.error("Exit from jabber account with error!", e);
       connection.disconnect();
     }
   }
