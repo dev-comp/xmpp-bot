@@ -212,7 +212,7 @@ public class XmppBot implements IBot, Runnable {
       Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.accept_all);
 
       while (true) {
-        Thread.sleep(15000);
+        Thread.sleep(45000);
 
         try {
           connection.sendStanza(presence);
